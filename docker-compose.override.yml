@@ -1,0 +1,10 @@
+services:
+  backend:
+    env_file:
+      - ./backend/.env.example
+    volumes:
+      - ./backend:/app # Live reload: mounts local code into the container
+    command: flask run --host=0.0.0.0 --port=5000 --debug
+  frontend:
+    env_file:
+      - ./frontend/.env.example
