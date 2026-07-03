@@ -13,7 +13,10 @@ def create_app(config_name: str = "development") -> Flask:
     migrate.init_app(app, db)
     CORS(app, origins=app.config["CORS_ORIGINS"])
 
+    from .models import User, Document, Category
+
     from .api import register_blueprints
+
     register_blueprints(app)
 
     return app
