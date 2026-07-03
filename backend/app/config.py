@@ -6,7 +6,7 @@ class BaseConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "jwt-secret-key")
     JWT_TOKEN_LOCATION = ["cookies"]
-    JWT_COOKIE_SECURE = False       # True in production (HTTPS)
+    JWT_COOKIE_SECURE = False  # True in production (HTTPS)
     JWT_COOKIE_SAMESITE = "Strict"
     JWT_COOKIE_CSRF_PROTECT = True  # Enable CSRF protection
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB
@@ -38,7 +38,7 @@ class ProductionConfig(BaseConfig):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
     CORS_ORIGINS = os.getenv("CORS_ORIGINS", "").split(",")
-    JWT_COOKIE_SECURE = True        # HTTPS only in production
+    JWT_COOKIE_SECURE = True  # HTTPS only in production
 
 
 config_by_name = {
