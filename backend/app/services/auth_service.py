@@ -1,7 +1,11 @@
 from flask_jwt_extended import create_access_token
 from app.extensions import db
 from app.models import User
-from werkzeug.security import generate_password_hash, check_password_hash
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
+
+
+ph = PasswordHasher()
 
 
 def register_user(data: dict) -> tuple[dict, int]:
@@ -16,7 +20,7 @@ def register_user(data: dict) -> tuple[dict, int]:
 
     user = User(
         email=email,
-        password_hash=generate_password_hash(password),
+        password_hash=ph.hash(password)
     )
     db.session.add(user)
     db.session.commit()
@@ -33,7 +37,12 @@ def login_user(data: dict) -> tuple[dict, int]:
 
     user = User.query.filter_by(email=email).first()
 
-    if not user or not check_password_hash(user.password_hash, password):
+    if not user:
+        return {"error": "Invalid email or password"}, 401
+
+    try:
+        ph.verify(user.password_hash, password)
+    except VerifyMismatchError:
         return {"error": "Invalid email or password"}, 401
 
     token = create_access_token(identity=str(user.id))
