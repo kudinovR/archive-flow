@@ -1,10 +1,22 @@
+# core
 flask~=3.1
-flask-sqlalchemy~=3.1
-flask-jwt-extended~=4.7
-flask-migrate~=4.1
 flask-cors~=5.0
+
+# auth & security
+flask-jwt-extended~=4.7
+argon2-cffi~=25.1.0
+
+# database
+flask-sqlalchemy~=3.1
+flask-migrate~=4.1
 psycopg2-binary~=2.9
+
+# server
 gunicorn~=23.0
+
+# utils
 python-dotenv~=1.0
+
+# testing
 pytest~=8.3
 pytest-flask~=1.3
