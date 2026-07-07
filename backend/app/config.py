@@ -25,10 +25,7 @@ class DevelopmentConfig(BaseConfig):
 
 class TestingConfig(BaseConfig):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = os.getenv(
-        "TEST_DATABASE_URL",
-        "postgresql://postgres:postgres@localhost:5432/archiveflow_test",
-    )
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     JWT_ACCESS_TOKEN_EXPIRES = False
     UPLOAD_FOLDER = "/tmp/archiveflow_test_uploads"
     CORS_ORIGINS = ["http://localhost:5173"]
