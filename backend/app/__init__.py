@@ -2,6 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from .config import config_by_name
 from .extensions import db, jwt, migrate, init_redis
+from .services.token_blacklist import is_token_revoked
 
 
 def create_app(config_name: str = "development") -> Flask:
@@ -19,4 +20,9 @@ def create_app(config_name: str = "development") -> Flask:
     from .api import register_blueprints
 
     register_blueprints(app)
+
+    @jwt.token_in_blocklist_loader
+    def token_in_blocklist_callback(_jwt_header, jwt_payload):
+        return is_token_revoked(jwt_payload)
+    
     return app
