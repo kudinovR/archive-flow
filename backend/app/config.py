@@ -21,6 +21,7 @@ class DevelopmentConfig(BaseConfig):
         "DATABASE_URL",
         "postgresql://postgres:postgres@localhost:5432/archiveflow_dev",
     )
+    REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
 
 class TestingConfig(BaseConfig):
@@ -29,6 +30,7 @@ class TestingConfig(BaseConfig):
     JWT_ACCESS_TOKEN_EXPIRES = False
     UPLOAD_FOLDER = "/tmp/archiveflow_test_uploads"
     CORS_ORIGINS = ["http://localhost:5173"]
+    REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/1")
 
 
 class ProductionConfig(BaseConfig):
@@ -36,6 +38,7 @@ class ProductionConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
     CORS_ORIGINS = os.getenv("CORS_ORIGINS", "").split(",")
     JWT_COOKIE_SECURE = True  # HTTPS only in production
+    REDIS_URL = os.getenv("REDIS_URL")
 
 
 config_by_name = {

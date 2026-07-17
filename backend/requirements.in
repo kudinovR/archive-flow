@@ -11,6 +11,9 @@ flask-sqlalchemy~=3.1
 flask-migrate~=4.1
 psycopg2-binary~=2.9
 
+# cache
+redis>=6.0,<7.0
+
 # server
 gunicorn~=23.0
 

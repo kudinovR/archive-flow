@@ -16,6 +16,15 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    container_name: archiveflow-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
   backend:
     build: ./backend
     restart: unless-stopped
@@ -28,6 +37,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+
   frontend:
     build: ./frontend
     restart: unless-stopped
@@ -40,4 +52,5 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
   uploads:
