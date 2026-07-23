@@ -8,6 +8,32 @@ from app.extensions import db as _db
 from app.models import User
 
 
+class FakeRedis:
+    def __init__(self):
+        self._keys = set()
+        self.last_set_call = None
+
+    def exists(self, key: str) -> int:
+        return 1 if key in self._keys else 0
+
+    def set(self, key: str, value: str, ex: int | None = None) -> bool:
+        # Mimic Redis SET with expiry: only persist keys when a positive TTL is provided.
+        self.last_set_call = (key, value, ex)
+        if ex is not None and ex > 0:
+            self._keys.add(key)
+            return True
+        return False
+
+
+@pytest.fixture
+def fake_redis(monkeypatch):
+    from app.services import token_blacklist
+
+    fake = FakeRedis()
+    monkeypatch.setattr(token_blacklist.redis_client, "client", fake)
+    return fake
+
+
 @pytest.fixture(scope="session")
 def app():
     app = create_app("testing")
