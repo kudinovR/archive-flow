@@ -44,6 +44,15 @@ def login_user(data: dict) -> tuple[dict, int]:
         ph.verify(user.password_hash, password)
     except VerifyMismatchError:
         return {"error": "Invalid email or password"}, 401
-
+    
+     # Rehash check
+    try:
+        if ph.check_needs_rehash(user.password_hash):
+            user.password_hash = ph.hash(password)
+            db.session.commit()
+    except Exception:
+        db.session.rollback()
+    
     token = create_access_token(identity=str(user.id))
     return {"access_token": token, "role": user.role}, 200
+

@@ -64,6 +64,23 @@ def clean_db(app):
 
 
 @pytest.fixture
+def user(app, clean_db, user_payload):
+    from app.services.auth_service import ph
+
+    payload = user_payload()
+    user = User(
+        email=payload["email"].strip().lower(),
+        password_hash=ph.hash(payload["password"]),
+        role="user",
+    )
+    _db.session.add(user)
+    _db.session.commit()
+
+    user._raw_password = payload["password"]
+    return user
+
+
+@pytest.fixture
 def user_payload():
     # Unique test data per call
     def _make(email=None, password="testpassword123"):
