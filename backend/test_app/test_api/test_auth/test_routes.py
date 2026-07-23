@@ -1,8 +1,11 @@
 import pytest
+from flask_jwt_extended import create_access_token
+from http.cookies import SimpleCookie
 
 
 API_REGISTER = "/api/auth/register"
 API_LOGIN = "/api/auth/login"
+API_LOGOUT = "/api/auth/logout"
 DEFAULT_PASSWORD = "password123"
 
 
@@ -91,3 +94,30 @@ class TestLogin:
         assert res_wrong_pass.status_code == 401
         assert res_wrong_email.status_code == 401
         assert res_wrong_pass.get_json()["error"] == res_wrong_email.get_json()["error"]
+
+
+class TestLogout:
+    def test_logout_requires_auth(self, client):
+        response = client.post("/api/auth/logout")
+        assert response.status_code == 401
+
+    def test_logout_returns_200_with_valid_cookie_token(
+        self, client, user_payload, fake_redis
+    ):
+        payload = user_payload()
+        client.post(API_REGISTER, json=payload)
+
+        login_res = client.post(API_LOGIN, json=payload)
+        assert login_res.status_code == 200
+
+        cookie = SimpleCookie()
+        for set_cookie in login_res.headers.getlist("Set-Cookie"):
+            cookie.load(set_cookie)
+
+        csrf_token = cookie["csrf_access_token"].value
+
+        response = client.post(API_LOGOUT, headers={"X-CSRF-TOKEN": csrf_token})
+        assert response.status_code == 200
+        body = response.get_json()
+        print(body)
+        assert body["msg"] == "Successfully logged out"

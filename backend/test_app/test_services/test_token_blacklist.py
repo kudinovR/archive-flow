@@ -4,32 +4,6 @@ from datetime import datetime, timedelta, timezone
 from app.services.token_blacklist import is_token_revoked, revoke_token
 
 
-class FakeRedis:
-    def __init__(self):
-        self._keys = set()
-        self.last_set_call = None
-
-    def exists(self, key: str) -> int:
-        return 1 if key in self._keys else 0
-
-    def set(self, key: str, value: str, ex: int | None = None) -> bool:
-        # Mimic Redis SET with expiry: only persist keys when a positive TTL is provided.
-        self.last_set_call = (key, value, ex)
-        if ex is not None and ex > 0:
-            self._keys.add(key)
-            return True
-        return False
-
-
-@pytest.fixture
-def fake_redis(monkeypatch):
-    from app.services import token_blacklist
-
-    fake = FakeRedis()
-    monkeypatch.setattr(token_blacklist.redis_client, "client", fake)
-    return fake
-
-
 class TestIsTokenRevoked:
     def test_returns_false_when_jti_not_blacklisted(self, fake_redis):
         payload = {"jti": "token-1"}
